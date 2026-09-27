@@ -1,0 +1,28 @@
+.env
+.stage1/
+squashfs-root/
+__pycache__/
+.pytest_cache/
+*.stl
+*.gcode
+*.log
+openclaw/plugins/print-farm-stl/node_modules/
+openclaw/plugins/print-farm-stl/dist/
+distribution/landing/dist/
+distribution/landing/data/
+distribution/landing/.env
+
+# Local credentials and generated landing submissions
+**/.env
+**/.env.*
+!**/.env.example
+distribution/landing/data/
+
+# Generated dependencies, builds, and Python caches
+**/node_modules/
+**/dist/
+**/__pycache__/
+*.py[cod]
+.venv/
+venv/
+.DS_Store

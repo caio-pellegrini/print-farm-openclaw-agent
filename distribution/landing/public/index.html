@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#080b09">
+    <title>3D Print Farm AI Operations Employee</title>
+    <meta name="description" content="An AI operations employee for small 3D print farms — quote custom STL jobs, coordinate production, and keep your operation moving.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="3D Print Farm AI Operations Employee">
+    <meta property="og:description" content="See how an AI operations employee can help small print farms move custom jobs from STL to production.">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="pt_BR">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/config.js" defer></script>
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="3D print farm agent home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span>print farm <span class="brand-dot">agent</span></span>
+      </a>
+      <nav class="header-nav" aria-label="Main navigation" data-i18n-aria="nav.aria">
+        <a href="#how-it-works" data-i18n="nav.workflow">How it works</a>
+        <a href="#for-businesses" data-i18n="nav.audience">For print farms</a>
+        <div class="language-toggle" role="group" aria-label="Choose language" data-i18n-aria="language.aria">
+          <button type="button" data-language="en" aria-pressed="true">EN</button><span aria-hidden="true">/</span><button type="button" data-language="pt" aria-pressed="false">PT</button>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero page-width" id="top">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="live-dot"></span><span data-i18n="hero.kicker">MADE FOR SMALL PRINT FARMS</span></p>
+          <h1 data-i18n="hero.title">Your AI operations employee for your 3D print farm.</h1>
+          <p class="hero-intro" data-i18n="hero.body">Receive the STL, estimate the job, prepare a quote, and turn approved orders into work ready for production. Run your farm solo or with a team.</p>
+          <div class="hero-actions">
+            <div class="hero-action-buttons"><a class="button button-primary beta-cta" href="#tester-form" data-i18n="cta.primary">I run a print farm — test it free</a><a class="button button-primary deploy-cta" href="#" hidden data-i18n="cta.deploy">Deploy the agent</a><a class="button button-secondary beta-secondary" href="#tester-form" hidden data-i18n="cta.secondary">Need help getting started? Join the beta</a></div>
+            <span class="free-pill" data-i18n="hero.free">FREE DURING EARLY ACCESS</span>
+          </div>
+          <p class="hero-note" data-i18n="hero.note">For solo operators and small teams</p>
+        </div>
+        <div class="hero-visual" role="img" aria-label="Illustrative request flowing from a customer through the agent to farm preparation" data-i18n-aria="hero.visual.aria">
+          <p class="hero-visual-label" data-i18n="hero.visual.kicker">ONE JOB · THREE HANDOFFS</p>
+          <div class="hero-flow">
+            <article class="hero-flow-card hero-customer-card">
+              <div class="hero-card-heading"><span class="hero-card-icon customer-icon" aria-hidden="true">↗</span><strong data-i18n="visual.customer">Customer</strong></div>
+              <div class="hero-request-file"><span class="hero-file-type">STL</span><span><b>part-model.stl</b><small data-i18n="hero.visual.request">4 × Black PLA</small></span></div>
+              <span class="hero-card-caption" data-i18n="hero.visual.attached">Model attached</span>
+            </article>
+            <span class="hero-flow-arrow" aria-hidden="true">→</span>
+            <article class="hero-flow-card hero-agent-card">
+              <div class="hero-agent-mark" aria-hidden="true">✳</div>
+              <span class="hero-agent-label" data-i18n="hero.visual.agent">PRINT FARM AGENT</span>
+              <strong data-i18n="hero.visual.approved">Quote approved</strong>
+              <small data-i18n="hero.visual.order">Order #137 · details together</small>
+              <span class="hero-state"><i></i><span data-i18n="hero.visual.organized">Job organized</span></span>
+            </article>
+            <span class="hero-flow-arrow" aria-hidden="true">→</span>
+            <article class="hero-flow-card hero-farm-card">
+              <div class="hero-card-heading"><span class="hero-card-icon farm-icon" aria-hidden="true">▤</span><strong data-i18n="visual.farm">Your farm</strong></div>
+              <div class="hero-check-row"><i>✓</i><span data-i18n="hero.visual.filament">Check filament</span></div>
+              <div class="hero-check-row"><i>✓</i><span data-i18n="hero.visual.printer">Prepare printer</span></div>
+              <span class="hero-card-caption" data-i18n="hero.visual.handoff">Operator handoff</span>
+            </article>
+          </div>
+          <div class="hero-flow-foot"><span data-i18n="hero.visual.foot">REQUEST</span><i></i><span data-i18n="hero.visual.foot.approval">APPROVAL</span><i></i><span data-i18n="hero.visual.foot.prep">FARM PREP</span></div>
+        </div>
+      </section>
+
+      <section class="workflow-section page-width" id="how-it-works" aria-labelledby="workflow-title">
+        <div class="section-title-row">
+          <div><p class="eyebrow" data-i18n="workflow.kicker">A CLEARER WAY TO RUN EACH JOB</p><h2 id="workflow-title" data-i18n="workflow.title">One request. A smoother operation.</h2></div>
+          <p class="section-aside" data-i18n="workflow.aside">From custom STL requests to production handoff.</p>
+        </div>
+        <div class="flow-cards">
+          <article class="flow-card"><span class="flow-icon icon-file" aria-hidden="true">↗</span><span class="flow-step">01</span><h3 data-i18n="flow.one.title">Quote</h3><p data-i18n="flow.one.body">Analyze an STL and estimate material, print time, and price.</p></article>
+          <span class="flow-connector" aria-hidden="true">→</span>
+          <article class="flow-card"><span class="flow-icon icon-chat" aria-hidden="true">•••</span><span class="flow-step">02</span><h3 data-i18n="flow.two.title">Order</h3><p data-i18n="flow.two.body">Keep the approved quote, customer, and job details together.</p></article>
+          <span class="flow-connector" aria-hidden="true">→</span>
+          <article class="flow-card"><span class="flow-icon icon-printer" aria-hidden="true">▤</span><span class="flow-step">03</span><h3 data-i18n="flow.three.title">Production</h3><p data-i18n="flow.three.body">Turn approved work into a clear next step for the operator.</p></article>
+        </div>
+      </section>
+
+      <section class="progress-section page-width" aria-labelledby="progress-title">
+        <div class="progress-heading"><div><p class="eyebrow" data-i18n="progress.kicker">EARLY ACCESS, WITH A CLEAR PICTURE</p><h2 id="progress-title" data-i18n="progress.title">What works today.</h2></div><p data-i18n="progress.note">Exercised locally with sample jobs. Print-time accuracy is still being checked.</p></div>
+        <div class="progress-panels">
+          <article class="progress-panel panel-working"><h3><span class="progress-icon">✓</span><span data-i18n="progress.works">Working today</span></h3><ul><li data-i18n="progress.item.one">STL analysis in OpenClaw</li><li data-i18n="progress.item.two">Cura slicing and material estimates</li><li data-i18n="progress.item.three">Quote calculation and saved estimates</li></ul></article>
+          <article class="progress-panel panel-next"><h3><span class="progress-icon">→</span><span data-i18n="progress.next">Coming next</span></h3><ul><li data-i18n="progress.next.one">Customer file intake and quote approval</li><li data-i18n="progress.next.two">Operator handoff and production workflow</li></ul></article>
+        </div>
+      </section>
+
+      <section class="conversation-section" aria-labelledby="conversation-title">
+        <div class="page-width conversation-layout">
+          <div class="conversation-copy">
+            <p class="eyebrow" data-i18n="conversation.kicker">A JOB, MOVING THROUGH THE FARM</p>
+            <h2 id="conversation-title" data-i18n="conversation.title">From “can you print this?” to ready for production.</h2>
+            <p data-i18n="conversation.body">One operational employee keeps the customer conversation and the production handoff connected, while your people stay in control.</p>
+            <div class="example-label"><span class="example-dot"></span><span data-i18n="conversation.example">Illustrative example · sample values</span></div>
+          </div>
+          <div class="phone-pair" role="group" aria-label="Illustrative customer and operator conversation" data-i18n-aria="conversation.aria">
+            <article class="phone-shell customer-phone" aria-label="Customer conversation" data-i18n-aria="chat.customer.phone">
+              <div class="phone-screen">
+                <div class="phone-notch" aria-hidden="true"></div>
+                <div class="phone-system-bar"><span>10:38</span><span aria-hidden="true">● ▰ ▰</span></div>
+                <div class="chat-topbar"><span class="person-avatar customer-avatar">JD</span><span><strong data-i18n="chat.customer.name">Jordan · Customer</strong><small data-i18n="chat.customer.online">PRINT REQUEST</small></span><span class="chat-menu" aria-hidden="true">•••</span></div>
+                <div class="phone-messages">
+                  <div class="chat-day" data-i18n="chat.today">TODAY · 10:38 AM</div>
+                  <div class="message message-customer"><p data-i18n="chat.customer.text">Hi! Could you print four of these in black PLA? I’ve attached the STL.</p><div class="attachment"><span class="stl-icon">STL</span><span><strong>part-model.stl</strong><small data-i18n="chat.attachment">3D model · 2.4 MB</small></span></div></div>
+                  <div class="message message-agent"><span class="message-label"><span class="mini-spark">✳</span><span data-i18n="chat.agent">PRINT FARM AGENT</span></span><p data-i18n="chat.quote">Sure! Four in black PLA would be <strong>$32</strong>. Would you like me to get the job ready?</p></div>
+                  <div class="message message-customer message-compact"><p data-i18n="chat.approval">Sounds good — let’s do it.</p></div>
+                  <div class="message message-agent message-short"><p data-i18n="chat.customer.confirm">Great, I’ll get your job ready with the farm team.</p></div>
+                </div>
+                <div class="phone-status"><span class="status-indicator"></span><span data-i18n="chat.customer.status">Quote approved · job moving to the farm</span></div>
+                <div class="phone-home-indicator" aria-hidden="true"></div>
+              </div>
+            </article>
+            <div class="phone-bridge" aria-hidden="true"><span>✳</span><i></i><b>→</b><i></i></div>
+            <article class="phone-shell operator-phone" aria-label="Operator job handoff" data-i18n-aria="chat.operator.phone">
+              <div class="phone-screen">
+                <div class="phone-notch" aria-hidden="true"></div>
+                <div class="phone-system-bar"><span>10:42</span><span aria-hidden="true">● ▰ ▰</span></div>
+                <div class="chat-topbar"><span class="person-avatar operator-avatar">OP</span><span><strong data-i18n="chat.operator.name">Farm operations</strong><small data-i18n="chat.operator.online">PRODUCTION HANDOFF</small></span><span class="chat-menu" aria-hidden="true">•••</span></div>
+                <div class="phone-messages operator-messages">
+                  <div class="chat-day" data-i18n="chat.operator.today">NEW APPROVED JOB</div>
+                  <div class="job-summary"><div class="job-summary-top"><span class="handoff-status"><i></i><span data-i18n="chat.handoff.label">APPROVED JOB</span></span><span class="printer-tag" data-i18n="chat.printer.tag">Suggested next step · A1 #2</span></div><strong data-i18n="chat.job.title">4 × Black PLA</strong><small data-i18n="chat.job.detail">Customer order · Part model</small><div class="job-specs"><span data-i18n="chat.job.time">Estimated print time <strong>6h 20m</strong></span><span data-i18n="chat.job.material">Estimated material <strong>180g</strong></span></div></div>
+                  <div class="message message-agent operator-instruction"><span class="message-label"><span class="mini-spark">✳</span><span data-i18n="chat.agent">PRINT FARM AGENT</span></span><p data-i18n="chat.handoff">Suggested next step: check whether Bambu A1 #2 is available. Please verify the black PLA, clean bed, and printer readiness.</p><div class="handoff-checks"><span><i aria-hidden="true">□</i><span data-i18n="chat.check.one">Filament</span></span><span><i aria-hidden="true">□</i><span data-i18n="chat.check.two">Print bed</span></span><span><i aria-hidden="true">□</i><span data-i18n="chat.check.three">Printer ready</span></span></div></div>
+                  <div class="message message-operator"><p data-i18n="chat.ready">All set — black PLA is loaded and the printer is ready.</p></div>
+                  <div class="message message-agent message-short"><p data-i18n="chat.confirm">Thanks — order #137 is ready to enter production.</p></div>
+                </div>
+                <div class="phone-status"><span class="status-indicator"></span><span data-i18n="chat.operator.status">Operator confirmed · ready for production</span></div>
+                <div class="phone-home-indicator" aria-hidden="true"></div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="audience-section page-width" id="for-businesses" aria-labelledby="audience-title">
+        <div><p class="eyebrow" data-i18n="invite.kicker">FOR SMALL 3D PRINTING BUSINESSES</p><h2 id="audience-title" data-i18n="invite.title">Run it solo. Grow with a team.</h2><p class="audience-body" data-i18n="invite.body">Built around real custom print jobs for owner/operators and small farm teams — especially if quotes, job details, and production steps live in too many places today.</p></div>
+        <div class="mode-cards"><article class="mode-card"><span class="mode-icon">⌂</span><div><strong data-i18n="mode.solo.title">Solo operation</strong><p data-i18n="mode.solo.body">You handle the owner and operator roles. The agent helps keep customer requests and job details together.</p></div><div class="mode-flow"><span data-i18n="mode.solo.owner">You</span><i>↔</i><b>AGENT</b><i>↔</i><span data-i18n="mode.solo.customer">Customers</span></div></article><article class="mode-card team-card"><span class="mode-icon">▤</span><div><strong data-i18n="mode.team.title">Small team</strong><p data-i18n="mode.team.body">The agent connects the customer request to the operator preparing the job, while you stay informed.</p></div><div class="mode-flow"><span data-i18n="mode.team.customer">Customer</span><i>↔</i><b>AGENT</b><i>↔</i><span data-i18n="mode.team.operator">Operator</span></div></article></div>
+      </section>
+
+      <section class="tester-section" id="tester-form" aria-label="Early tester options" data-i18n-aria="form.section">
+        <div class="page-width tester-card">
+          <div class="tester-prompt"><p class="eyebrow" data-i18n="form.kicker">EARLY ACCESS · FREE TO TEST</p><h2 data-i18n="form.title">Try the agent free on your print farm.</h2><p data-i18n="form.body">We’re looking for small print businesses handling real custom jobs. Share your interest and we’ll help find a useful first workflow to try.</p><span class="free-pill" data-i18n="hero.free">FREE DURING EARLY ACCESS</span></div>
+          <div class="conversion-paths">
+            <article class="conversion-card primary-path"><span class="path-number">01</span><h3 data-i18n="form.direct.title">Want to test it?</h3><p data-i18n="form.direct.body">A short form is all it takes to start the conversation.</p><button class="button button-primary form-open" type="button" data-i18n="form.open">I want to test it free</button></article>
+            <article class="conversion-card contact-path" id="contact-options" hidden><span class="path-number">02</span><h3 data-i18n="contact.title">Prefer to talk first?</h3><p data-i18n="contact.body">Reach me directly. No form needed.</p><div class="contact-links"><a class="contact-link contact-discord" data-contact="discord" hidden><span aria-hidden="true">◉</span><span data-i18n="contact.discord">Discord</span><b aria-hidden="true">↗</b></a><a class="contact-link contact-email" data-contact="email" hidden><span aria-hidden="true">✉</span><span data-i18n="contact.email">Email</span><b aria-hidden="true">↗</b></a><a class="contact-link contact-whatsapp" data-contact="whatsapp" hidden><span aria-hidden="true">◌</span><span data-i18n="contact.whatsapp">WhatsApp</span><b aria-hidden="true">↗</b></a></div></article>
+          </div>
+          <details class="tester-form-details" id="short-tester-form">
+            <summary><span><span class="summary-title" data-i18n="form.summary">Tell us a little about your farm</span><small data-i18n="form.summary.note">Only a few details to get started</small></span><span class="summary-icon" aria-hidden="true">+</span></summary>
+            <form id="tester-intake" novalidate>
+              <div class="form-grid">
+                <label><span data-i18n="form.name">Name</span><input name="name" autocomplete="name" maxlength="100" data-i18n-placeholder="form.name.placeholder" placeholder="How should we address you?"></label>
+                <label><span data-i18n="form.contact">Email or preferred contact</span><input name="contact" autocomplete="email" required maxlength="160" data-i18n-placeholder="form.contact.placeholder" placeholder="Email, Discord, or WhatsApp"></label>
+                <label><span data-i18n="form.printerCount">Number of printers</span><select name="printerCount" required><option value="" selected disabled data-i18n="form.printerCount.placeholder">Select a number</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="40">40</option><option value="50">50</option><option value="75">75</option><option value="100">100</option></select></label>
+                <label class="full-width"><span data-i18n="form.models">Printer brands / models</span><input name="printerModels" maxlength="300" data-i18n-placeholder="form.models.placeholder" placeholder="e.g. Bambu A1, Prusa MK4"></label>
+                <fieldset class="full-width"><legend data-i18n="form.customStl">Do you accept custom STL jobs?</legend><label class="radio-option"><input type="radio" name="customJobs" value="yes"><span data-i18n="form.yes">Yes</span></label><label class="radio-option"><input type="radio" name="customJobs" value="no"><span data-i18n="form.no">No</span></label></fieldset>
+                <label class="full-width"><span data-i18n="form.pain">What’s the biggest pain in handling custom orders?</span><textarea name="biggestPain" rows="2" maxlength="1200" data-i18n-placeholder="form.pain.placeholder" placeholder="Quotes, tracking jobs, production handoff…"></textarea></label>
+                <label class="honeypot" aria-hidden="true">Leave this field empty<input name="company" tabindex="-1" autocomplete="off"></label>
+              </div>
+              <button class="button button-primary form-submit" type="submit" data-i18n="form.submit">Send my interest</button>
+              <p class="form-feedback" id="form-feedback" role="status" aria-live="polite"></p>
+            </form>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><div class="page-width footer-row"><span>© <span id="year"></span> 3D Print Farm Agent</span><span data-i18n="footer.note">Built for the people who keep print farms running.</span><span class="hackathon-note" data-i18n="footer.hackathon">Started during the OpenClaw 2.0 “Startup’s First Hire” Hackathon. Now inviting print farms to early testing.</span></div></footer>
+  </body>
+</html>

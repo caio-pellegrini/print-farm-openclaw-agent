@@ -1,0 +1,63 @@
+{
+  "id": "print-farm-stl",
+  "name": "Print Farm STL Analysis",
+  "description": "Analyze STL files from a restricted local jobs directory.",
+  "version": "0.1.0",
+  "configSchema": {
+    "type": "object",
+    "required": [
+      "jobsDirectory",
+      "analyzerScript",
+      "persistenceScript",
+      "productionEstimateScript",
+      "quoteEngine",
+      "databasePath"
+    ],
+    "properties": {
+      "jobsDirectory": {
+        "type": "string",
+        "description": "Absolute path to the trusted STL jobs directory."
+      },
+      "analyzerScript": {
+        "type": "string",
+        "description": "Absolute path to experiments/stl-analysis/analyze_stl.py."
+      },
+      "persistenceScript": {
+        "type": "string",
+        "description": "Absolute path to experiments/stl-analysis/persistence.py."
+      },
+      "productionEstimateScript": {
+        "type": "string",
+        "description": "Absolute path to experiments/slicing/openclaw_production_estimate.py."
+      },
+      "quoteEngine": {
+        "type": "string",
+        "description": "Absolute path to experiments/quote-engine/quote.py."
+      },
+      "databasePath": {
+        "type": "string",
+        "description": "Absolute path to the project-local SQLite database."
+      },
+      "pythonExecutable": {
+        "type": "string",
+        "description": "Python executable path or PATH-resolved name; defaults to python3."
+      },
+      "dockerExecutable": {
+        "type": "string",
+        "description": "Docker executable path or PATH-resolved name; defaults to docker."
+      }
+    },
+    "additionalProperties": false
+  },
+  "activation": {
+    "onStartup": true
+  },
+  "contracts": {
+    "tools": [
+      "analyze_stl",
+      "get_latest_stl_analysis",
+      "slice_stl",
+      "get_latest_production_estimate"
+    ]
+  }
+}
