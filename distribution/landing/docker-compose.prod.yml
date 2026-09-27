@@ -1,0 +1,19 @@
+services:
+  print-farm-landing:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 4173
+      LANDING_DATA_DIR: /data
+      DISCORD_WEBHOOK_URL: "${DISCORD_WEBHOOK_URL:?Set this secret in Dokploy}"
+    expose:
+      - "4173"
+    volumes:
+      - print-farm-landing-data:/data
+
+volumes:
+  print-farm-landing-data:

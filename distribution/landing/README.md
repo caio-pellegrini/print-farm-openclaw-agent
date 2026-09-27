@@ -42,6 +42,10 @@ The browser posts to the same-origin `POST /api/testers` endpoint implemented by
 
 Deploy the Node server to a small Node-capable host (for example, a basic VPS or a Node application service) with persistent private storage for the JSONL file and `DISCORD_WEBHOOK_URL` configured as a server-side secret. A static host alone will serve the page but cannot accept submissions; in that case, point the form to a separately hosted endpoint and update the client accordingly. Configure HTTPS and a persistent data volume before collecting real responses.
 
+### Dokploy on the VPS
+
+The production Compose file is `docker-compose.prod.yml` in this directory. Configure the Dokploy Compose service to use this repository's `main` branch and that file, then add `DISCORD_WEBHOOK_URL` in the service's environment settings as a secret. The Compose stack builds the included Dockerfile, listens on port `4173`, and stores form responses in the named `print-farm-landing-data` volume mounted at `/data`. Route `printfarmagent.caiopellegrini.com.br` to the `print-farm-landing` service on port `4173` with HTTPS enabled. Keep the volume when redeploying; do not use a fresh-volume deployment for routine updates.
+
 ## Known limitations
 
 The “Working today” items refer to local exercises with sample jobs, not a hosted production service. Cura print-time accuracy is still being checked. Customer-facing file intake, quote approval, operator handoff, and production workflow are listed as coming next. The phone conversation is illustrative; it does not indicate a live printer connection, scheduler, Bambu integration, or print-queue action. The contact destinations are empty until configured. Analytics are not installed.
