@@ -543,6 +543,12 @@ The rules reviewed so far do **not explicitly state** whether compensating resea
 
 However, directly paying the "top users" based on usage volume could reasonably be perceived as incentivizing leaderboard activity rather than genuine product usage.
 
+## Official Hackathon Prize — Secondary Incentive
+
+The hackathon organizers' official prize includes a Mac Mini for the top user of the winning agent. This is an organizer-provided award, not a reward created, funded, or guaranteed by our project; it only applies if our project wins. Mention it as a small secondary reason to try the product, after the real print-farm value and free early access.
+
+Invite operators to use the agent on real 3D-printing work and share feedback. Do not encourage or reward spam, artificial activity, token farming, leaderboard manipulation, or unnecessary workloads. Usage should come from genuine farm jobs, and all messaging must remain clear that the organizers provide the prize.
+
 Therefore the current decision is:
 
 ```text
@@ -724,7 +730,7 @@ Next step: Choose the public host, set a persistent storage location and deploym
 
 ### Product presentation revision — 2026-09-27
 
-The landing now uses a stronger black/green visual system, DM Sans typography, compact cards, and a customer-to-farm visual. A compact “Working today / Coming next” section presents progress without internal project terminology. A customer, agent, and operator conversation is presented as an illustrative example with sample values and is clearly labeled; it does not claim that this full handoff is implemented. The copy focuses on small print farms, including solo operators and teams, and retains the bilingual tester form and beta CTA. The hackathon appears only as a small footer note. Tester messaging makes free early access clear and offers a short form plus configurable direct-contact links.
+The landing now uses a stronger black/green visual system, DM Sans typography, compact cards, and a customer-to-farm visual. A compact “Working today / Coming next” section presents progress without internal project terminology. A customer, agent, and operator conversation is presented as an illustrative example with sample values and is clearly labeled; it does not claim that this full handoff is implemented. The copy focuses on small print farms, including solo operators and teams, and retains the bilingual tester form and beta CTA. The hackathon remains secondary to product value and free early access. A compact note near the final tester CTA describes the organizers' Mac Mini prize for the top user of the winning agent, makes clear that the organizers provide it, and asks for real usage only. Tester messaging offers a short form plus configurable direct-contact links.
 
 ## Outreach Notes
 
