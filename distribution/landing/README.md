@@ -48,4 +48,4 @@ The production Compose file is `docker-compose.prod.yml` in this directory. Conf
 
 ## Known limitations
 
-The “Working today” items refer to local exercises with sample jobs, not a hosted production service. Cura print-time accuracy is still being checked. Customer-facing file intake, quote approval, operator handoff, and production workflow are listed as coming next. The phone conversation is illustrative; it does not indicate a live printer connection, scheduler, Bambu integration, or print-queue action. The contact destinations are empty until configured. Analytics are not installed.
+The “Working today” items refer to local exercises with sample jobs, not a hosted production service. Cura print-time accuracy is still being checked. Customer-facing file intake, quote approval, operator handoff, and production workflow are listed as coming next. The phone conversation is illustrative; it does not indicate a live printer connection, scheduler, Bambu integration, or print-queue action. Analytics are not installed.

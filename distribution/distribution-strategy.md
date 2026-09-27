@@ -724,9 +724,9 @@ English copy changes: Describes STL analysis, Cura slicing/material estimates, q
 
 Portuguese copy changes: Natural Brazilian Portuguese translation; language choice updates visible copy, page language, title, and description.
 
-Issues: Production hosting still needs a persistent writable private data directory and an operator process for tester follow-up. The agent itself does not yet provide the complete customer-to-production flow.
+Issues: The public landing is deployed to `https://printfarmagent.caiopellegrini.com.br` on Dokploy. The Node service uses a named persistent volume for private JSONL submissions, and Discord forwarding is configured server-side. Tester follow-up remains manual. The agent itself does not yet provide the complete customer-to-production flow.
 
-Next step: Choose the public host, set a persistent storage location and deployment URL, then switch `ctaMode` to `deploy` once installation is ready.
+Next step: Follow up with early tester submissions and monitor the first production deployment. Switch `ctaMode` to `deploy` once installation is ready.
 
 ### Product presentation revision — 2026-09-27
 
