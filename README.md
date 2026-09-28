@@ -100,8 +100,8 @@ The repo includes the official [standalone Agent Index client](standalone/agent_
 To register this install after you have exercised at least one agent turn:
 
 ```sh
-git clone https://github.com/plow-pbc/plow-agents.git
-export PATH="$PWD/plow-agents/bin:$PATH"
+git clone https://github.com/plow-pbc/plow-agents.git /tmp/plow-agents
+export PATH="/tmp/plow-agents/bin:$PATH"
 plow-agents login
 export PLOW_AGENT_TOKEN="$(cat ~/.config/plow/token)"
 docker compose exec print-farm-operator python3 /opt/print-farm-operator/standalone/agent_index_client.py \
