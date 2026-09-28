@@ -5,16 +5,17 @@ import json
 
 
 def quote(weight_g, hours, material_brl_kg=90, machine_brl_h=2, energy_kwh=0.12,
-          energy_brl_kwh=0.95, margin=0.40, quantity=1, setup_brl=0):
+          energy_brl_kwh=0.95, margin=0.40, quantity=1, setup_brl=0,
+          minimum_order_fee=0, currency="BRL"):
     material = weight_g * quantity / 1000 * material_brl_kg
     machine = hours * quantity * machine_brl_h
     energy = hours * quantity * energy_kwh * energy_brl_kwh
     cost = material + machine + energy + setup_brl
-    price = cost / (1 - margin)
+    price = max(cost / (1 - margin), minimum_order_fee)
     return {"inputs": locals(), "estimated_cost_brl": round(cost, 2),
             "suggested_unit_price_brl": round(price / quantity, 2),
             "suggested_order_price_brl": round(price, 2),
-            "estimated_gross_profit_brl": round(price - cost, 2)}
+            "estimated_gross_profit_brl": round(price - cost, 2), "currency": currency}
 
 
 def quote_slicer_result(result, *, material_brl_kg=90, machine_brl_h=2,
@@ -57,6 +58,8 @@ def main():
     p.add_argument("--margin", type=float, default=.40)
     p.add_argument("--quantity", type=int, default=1)
     p.add_argument("--setup-brl", type=float, default=0)
+    p.add_argument("--minimum-order-fee", type=float, default=0)
+    p.add_argument("--currency", default="BRL")
     a = p.parse_args()
     if a.quantity <= 0 or not 0 <= a.margin < 1:
         p.error("quantity must be positive and margin in [0, 1)")

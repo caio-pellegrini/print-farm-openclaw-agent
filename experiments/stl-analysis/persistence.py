@@ -9,43 +9,12 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from farm_domain import connect_database
+
 
 def connect(database: Path) -> sqlite3.Connection:
-    database.parent.mkdir(parents=True, exist_ok=True)
-    connection = sqlite3.connect(database, timeout=5)
-    connection.execute("PRAGMA busy_timeout = 5000")
-    connection.execute(
-        """CREATE TABLE IF NOT EXISTS stl_analyses (
-            analysis_id TEXT PRIMARY KEY,
-            filename TEXT NOT NULL,
-            dimensions_json TEXT NOT NULL,
-            analysis_json TEXT NOT NULL,
-            created_at TEXT NOT NULL,
-            status TEXT NOT NULL CHECK (status = 'completed')
-        )"""
-    )
-    connection.execute(
-        """CREATE TABLE IF NOT EXISTS production_estimates (
-            estimate_id TEXT PRIMARY KEY,
-            analysis_id TEXT NOT NULL,
-            filename TEXT NOT NULL,
-            profile TEXT NOT NULL,
-            slicing_json TEXT NOT NULL,
-            estimated_material_g REAL NOT NULL,
-            estimated_print_time_seconds INTEGER NOT NULL,
-            quote_json TEXT NOT NULL,
-            business_config_json TEXT NOT NULL,
-            request_summary TEXT NOT NULL DEFAULT '',
-            created_at TEXT NOT NULL,
-            status TEXT NOT NULL CHECK (status = 'completed')
-        )"""
-    )
-    columns = {row[1] for row in connection.execute("PRAGMA table_info(production_estimates)")}
-    if "request_summary" not in columns:
-        connection.execute(
-            "ALTER TABLE production_estimates ADD COLUMN request_summary TEXT NOT NULL DEFAULT ''"
-        )
-    return connection
+    return connect_database(database)
 
 
 def store(database: Path, filename: str, result_file: Path) -> dict:
@@ -134,8 +103,10 @@ def store_estimate(database: Path, record: dict) -> dict:
             """INSERT INTO production_estimates
                (estimate_id, analysis_id, filename, profile, slicing_json,
                 estimated_material_g, estimated_print_time_seconds, quote_json,
-                business_config_json, request_summary, created_at, status)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'completed')""",
+                business_config_json, request_summary, created_at, status,
+                quote_readiness_status, profile_version, material_id, material_version,
+                business_config_version)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'completed', ?, ?, ?, ?, ?)""",
             (
                 estimate_id,
                 record["analysis_id"],
@@ -148,6 +119,11 @@ def store_estimate(database: Path, record: dict) -> dict:
                 json.dumps(record["business_config"]),
                 record["request_summary"],
                 created_at,
+                record.get("quote_readiness_status", "legacy_unverified"),
+                record.get("profile_version"),
+                record.get("material_id"),
+                record.get("material_version"),
+                record.get("business_config_version"),
             ),
         )
     return {"estimate_id": estimate_id, "created_at": created_at, "status": "completed"}
@@ -158,7 +134,9 @@ def latest_estimate(database: Path) -> dict:
         row = connection.execute(
             """SELECT estimate_id, analysis_id, filename, profile, slicing_json,
                       estimated_material_g, estimated_print_time_seconds,
-                      quote_json, business_config_json, request_summary, created_at, status
+                      quote_json, business_config_json, request_summary, created_at, status,
+                      quote_readiness_status, profile_version, material_id, material_version,
+                      business_config_version
                FROM production_estimates ORDER BY created_at DESC, rowid DESC LIMIT 1"""
         ).fetchone()
     if row is None:
@@ -177,16 +155,54 @@ def latest_estimate(database: Path) -> dict:
         "request_summary": row[9],
         "created_at": row[10],
         "status": row[11],
+        "quote_readiness_status": row[12],
+        "profile_version": row[13],
+        "material_id": row[14],
+        "material_version": row[15],
+        "business_config_version": row[16],
     }
+
+
+def store_slicer_run(database: Path, record: dict) -> dict:
+    required = {"analysis_id", "filename", "profile", "slicing", "quote_readiness_status"}
+    if required - record.keys():
+        raise ValueError("Slicer run is missing required fields")
+    run_id = str(uuid.uuid4())
+    created_at = datetime.now(timezone.utc).isoformat()
+    with connect(database) as connection:
+        analysis = connection.execute("SELECT filename FROM stl_analyses WHERE analysis_id=?", (record["analysis_id"],)).fetchone()
+        if analysis is None or analysis[0] != record["filename"]:
+            raise ValueError("The linked STL analysis does not exist for this filename")
+        connection.execute("""INSERT INTO slicer_runs
+          (run_id,analysis_id,filename,profile_id,profile_version,slicer_result_json,
+           execution_status,quote_readiness_status,created_at)
+          VALUES (?,?,?,?,?,?,'completed',?,?)""",
+          (run_id,record["analysis_id"],record["filename"],record["profile"],
+           record.get("profile_version"),json.dumps(record["slicing"]),
+           record["quote_readiness_status"],created_at))
+    return {"run_id":run_id,"created_at":created_at,"execution_status":"completed"}
+
+
+def latest_slicer_run(database: Path) -> dict:
+    with connect(database) as connection:
+        row = connection.execute("""SELECT run_id,analysis_id,filename,profile_id,profile_version,
+          slicer_result_json,execution_status,quote_readiness_status,created_at
+          FROM slicer_runs ORDER BY created_at DESC,rowid DESC LIMIT 1""").fetchone()
+    if row is None:
+        return {"found":False,"message":"No slicer run has been stored yet."}
+    return {"found":True,"run_id":row[0],"analysis_id":row[1],"filename":row[2],
+        "profile":row[3],"profile_version":row[4],"slicing":json.loads(row[5]),
+        "execution_status":row[6],"quote_readiness_status":row[7],"created_at":row[8]}
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=("store", "latest", "get", "store-estimate", "latest-estimate"))
+    parser.add_argument("action", choices=("store", "latest", "get", "store-estimate", "latest-estimate", "store-slicer-run", "latest-slicer-run"))
     parser.add_argument("--database", required=True, type=Path)
     parser.add_argument("--filename")
     parser.add_argument("--result-file", type=Path)
     parser.add_argument("--estimate-file", type=Path)
+    parser.add_argument("--run-file", type=Path)
     parser.add_argument("--analysis-id")
     args = parser.parse_args()
 
@@ -204,6 +220,12 @@ def main() -> int:
         if not args.estimate_file:
             parser.error("store-estimate requires --estimate-file")
         result = store_estimate(args.database, json.loads(args.estimate_file.read_text(encoding="utf-8")))
+    elif args.action == "store-slicer-run":
+        if not args.run_file:
+            parser.error("store-slicer-run requires --run-file")
+        result = store_slicer_run(args.database,json.loads(args.run_file.read_text(encoding="utf-8")))
+    elif args.action == "latest-slicer-run":
+        result = latest_slicer_run(args.database)
     else:
         result = latest_estimate(args.database)
     json.dump(result, sys.stdout, ensure_ascii=False)

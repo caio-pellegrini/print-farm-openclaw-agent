@@ -1,0 +1,78 @@
+{
+  "appimage_sha256": "d501b103fac5424513ec0e8d6bc145fb30719de2c7d94d7320d723740c81a7fd",
+  "cli_preset_compatibility": "accepted (compatible 1)",
+  "effective_settings": {
+    "bottom_shell_layers": "3",
+    "brim_width": "5",
+    "curr_bed_type": "Cool Plate",
+    "enable_prime_tower": "1",
+    "enable_support": "0",
+    "filament_density": [
+      "1.26"
+    ],
+    "filament_diameter": [
+      "1.75"
+    ],
+    "filament_max_volumetric_speed": [
+      "21"
+    ],
+    "filament_settings_id": [
+      "Bambu PLA Basic @BBL A1"
+    ],
+    "filament_type": [
+      "PLA"
+    ],
+    "filament_vendor": [
+      "Bambu Lab"
+    ],
+    "layer_height": "0.2",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "print_settings_id": "0.20mm Standard @BBL A1",
+    "printer_model": "Bambu Lab A1",
+    "printer_settings_id": "Bambu Lab A1 0.4 nozzle",
+    "skirt_loops": "0",
+    "sparse_infill_density": "15%",
+    "top_shell_layers": "5",
+    "wall_loops": "2"
+  },
+  "effective_settings_source": "Metadata/project_settings.config from CLI-exported 3MF; CLI --export-settings did not emit a settings file for this headless STL invocation",
+  "fixture_sha256": "4ca3d19d01e11ee608d81218670db3547d320cbc7bef4e36b64339cf4285ad70",
+  "gui_parity": "not yet tested: no Bambu Studio GUI session or tester GUI project was available",
+  "physical_print_validation": "not started per instruction",
+  "profile_bundle_sha256": "ed6ace8e94e869076168f560f4cbaa971a09eeefb40d2b40adca1753a6bff242",
+  "result": {
+    "effective_project_sha256": "b3ef4181da923f56b131dfda5df4f43881e155e49afd8ff5b276dccd47b07027",
+    "filament_changes": 0,
+    "filament_count": 1,
+    "filament_density_g_cm3": 1.26,
+    "filament_length_mm": 825.51,
+    "filament_volume_mm3": 1985.58,
+    "filament_weight_g": 2.5,
+    "gcode_sha256": "3779a32f87b1c75e9968176842030fa9d06fefc1b9f2932665e20aa3478d70fc",
+    "layers": 60,
+    "object_count": 1,
+    "print_time_seconds": 481.49,
+    "return_code": 0,
+    "triangle_count": 12
+  },
+  "selected_presets": {
+    "filament": {
+      "inherits": "Bambu PLA Basic @base",
+      "preset_id": "Bambu PLA Basic @BBL A1",
+      "setting_id": "GFSA00_04"
+    },
+    "machine": {
+      "inherits": "fdm_bbl_3dp_001_common",
+      "preset_id": "Bambu Lab A1 0.4 nozzle",
+      "setting_id": "GM030"
+    },
+    "process": {
+      "inherits": "fdm_process_single_0.20",
+      "preset_id": "0.20mm Standard @BBL A1",
+      "setting_id": "GP079"
+    }
+  },
+  "studio_version": "02.08.02.61"
+}

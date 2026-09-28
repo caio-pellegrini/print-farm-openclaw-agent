@@ -1,0 +1,19 @@
+{
+  "evidence_origin": "Profile files extracted from the Stage 3 Bambu Docker image before the homologation bundle replacement.",
+  "files": {
+    "filament.json": {
+      "sha256": "cf4a444615fc5d120b21737382532ca1fa0c60fcfc5b57da80122f376f5ad6b3",
+      "size_bytes": 3432
+    },
+    "machine.json": {
+      "sha256": "23873a5ce06803d2e5493c3cac876c52a5bd3511dd1c4fb273efe2ea54d493f8",
+      "size_bytes": 27905
+    },
+    "process.json": {
+      "sha256": "fd197ed128f721f0a2b8aa8ac8d16d8d1e469dadcd6aac9c1f4f20c898192e9b",
+      "size_bytes": 4167
+    }
+  },
+  "schema_version": 1,
+  "slicer_version": "02.08.02.61"
+}

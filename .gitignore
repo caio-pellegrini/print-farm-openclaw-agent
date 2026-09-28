@@ -26,3 +26,13 @@ distribution/landing/data/
 .venv/
 venv/
 .DS_Store
+
+# Private deployment data and local tester research
+early-testers-*
+**/.agent-index/
+**/.agent-index.json
+**/*.sqlite
+**/*.sqlite-*
+**/*.db
+**/*.3mf
+openclaw/workspace/media/

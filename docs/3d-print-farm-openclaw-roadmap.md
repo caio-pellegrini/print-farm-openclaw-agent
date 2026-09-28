@@ -876,7 +876,7 @@ Persistence observations:
 
 Next recommendation:
 
-- Stage 3 research found that the project can normalize and quote two independent slicer outputs. Proceed to Stage 4 (Persistent Domain Model and Farm Configuration), including an explicit versioned slicer/profile registry and configured material-density records. Keep Orca disabled in the OpenClaw tool until those profile records are imported and validated; do not add printer APIs in Stage 4.
+- Stage 3 extended execution tested CuraEngine, OrcaSlicer, Bambu Studio, and Creality Print through the same normalized result and quote function. Stage 3 remains PASSED at prototype scope. Stage 4 may begin when scheduled: implement Persistent Domain Model and Farm Configuration with exact slicer versions, imported profile IDs/digests, material-density records, and profile validation state. Keep all non-Cura slicers out of OpenClaw until their profiles and metrics pass farm validation; investigate Bambu's anomalously high filament amount before enabling its quoting path. Do not add printer APIs in Stage 4.
 
 ---
 
@@ -886,16 +886,24 @@ Next recommendation:
 
 Prove that the application can produce a common quote input from two real slicers without adding slicer-specific business logic.
 
-### Stage 3 outcome — PASSED (prototype scope)
+### Stage 3 outcome — PASSED (four-adapter prototype scope)
 
-- Executed CuraEngine 5.13.0 and OrcaSlicer 2.4.2 against the same privately staged `small-box-20mm.stl` (SHA-256 `4ca3d19d01e11ee608d81218670db3547d320cbc7bef4e36b64339cf4285ad70`).
-- Both adapters returned a normalized result with slicer/version, approved profile identifiers, print time, filament volume, warnings, and errors. Orca also produced G-code artifact metadata. The generic quote function accepts a separate explicit density and calculates grams from volume.
-- The same `quote_slicer_result` function consumed both results without a slicer-ID branch. The Cura and Orca profiles are different and are not a comparative accuracy test.
-- Bambu Studio and Creality Print were investigated from official/current documentation only. PrusaSlicer CLI help/preset loading was explored earlier, but no slice was completed.
+- Executed CuraEngine 5.13.0, OrcaSlicer 2.4.2, Bambu Studio 02.08.02.61, and Creality Print 7.2.1.5476 against the same privately staged `small-box-20mm.stl` (SHA-256 `4ca3d19d01e11ee608d81218670db3547d320cbc7bef4e36b64339cf4285ad70`).
+- All four adapters returned a normalized result with slicer/version, approved profile identifiers, print time, filament volume, warnings, and errors. The generated G-code artifact metadata was included where the slicer produced G-code. The generic quote function accepts separate explicit density and calculates grams from volume.
+- The same `quote_slicer_result` function consumed all four results without a slicer-ID branch. Their profiles differ and the numeric outputs are not comparative accuracy evidence. Bambu's volume/mass is internally consistent with the slicer header but anomalously high for the fixture and is not suitable for business quoting until investigated.
+- Creality's stock Ender-3 V3 SE machine/process/filament profile files loaded directly. Bambu required a complete inheritance-resolved A1 preset bundle with CLI identity and compatibility fields; a stock preset fragment failed with `return_code=-5`.
 - The Orca CLI needed a checked-in adapter profile with one fixed compatibility value (`use_relative_e_distances=0`); its unmodified bundled combination failed preflight validation. Orca's G-code reports density as 0, so the proof's generic quote call supplies an explicit PLA density (1.24 g/cm³) and derives grams from slicer filament volume. Farm-specific density must be configured in Stage 4.
 - The adapter prototype is not yet exposed through OpenClaw. The current OpenClaw tool remains Cura-only and retains its filename/profile allowlists and fixed command construction.
 
+The Stage 3 adapter proof used private staged input and constrained Docker execution for all four slicers. The AppImage-based Docker recipes pin base/image checksums; OS package versions remain unlocked. The OpenClaw plugin remains Cura-only and exposes no arbitrary slicer arguments or free-form settings.
+
 See [the Stage 3 proof report](stage-3-multi-slicer-proof-report.md), [the slicer comparison](slicer-comparison.md), and the reproducible [proof runner](../experiments/slicing/run_stage3_proof.py).
+
+### Bambu Studio homologation priority — 2026-09-28
+
+One committed tester confirmed a Bambu Lab A1 with a 0.4 mm nozzle and uses Bambu Studio because it already connects directly to the printer. This is distribution evidence and makes Bambu Studio homologation a product priority. The repository's A1 0.4 mm machine target now matches confirmed tester hardware; its single-filament PLA material and 0.20 mm Standard process are investigation choices, not yet tester-confirmed.
+
+The next technical priority is Bambu preset/CLI compatibility and GUI↔CLI parity. The official CLI contract expects complete configs, while compatibility depends on system-preset identity and ancestry. A new parent-to-child-resolved profile bundle preserves Bambu's bundled `from`, `setting_id`, `name`, and `inherits` metadata; Studio 02.08.02.61 accepts it (`compatible 1`) and sliced the hashed Stage 3 box at 481.49 s and 1,985.58 mm³ (825.51 mm filament; 2.50 g at 1.26 g/cm³; one object/filament, 60 layers). The historical inherited-profile slice remains about 43,487 mm³. The cause of that difference is not confirmed, and no GUI parity run has been completed. The new profile is not quote-safe; preserve the blocked trust state. Obtain an equivalent GUI project/output and compare preset identities, effective values, time, filament metrics, and object/layer counts before physical print validation. Keep printer APIs, job control, telemetry, and Stage 6 adapters out of scope, and keep Bambu outside the model-facing OpenClaw allowlist. See the [Bambu homologation plan](bambu-homologation-implementation-plan.md) and [comparison evidence](../experiments/slicing/evidence/bambu-a1-system-chain/slice-comparison.json).
 
 ### Research outcomes
 
@@ -903,7 +911,7 @@ The comparison covers Linux support, headless CLI, profile inputs, time/material
 
 ### Required result
 
-The Stage 3 prototype meets the two-adapter proof requirement. Before production use, add reviewed profile ingestion/validation and verify the configured material density and full profile state for each deployed printer/material/process combination.
+The Stage 3 prototype meets and exceeds the two-adapter proof requirement. Stage 4 may begin when scheduled. Before production use, add reviewed profile ingestion/validation and verify configured material density and full profile state for each deployed printer/material/process combination. Resolve Bambu's anomalous material result before enabling its quote path.
 
 ### Agent notes
 
@@ -985,9 +993,29 @@ Questions/limitations:
 Next recommendation:
 ```
 
+### Stage 4 implementation notes — 2026-09-27
+
+**Stage 4 status: PASSED.** The requested persistent configuration foundation, migration/preservation behavior, quote-readiness separation, and domain-table coverage are implemented and verified. This status does not approve any Stage 3 profile for production quoting.
+
+Schema version: SQLite `PRAGMA user_version = 5`, managed by `experiments/farm_domain.py`. Existing `stl_analyses` and `production_estimates` rows are retained and legacy estimates are marked `legacy_unverified` for quote readiness. Successful slices without quote approval are stored as `slicer_runs`, separate from production estimates.
+
+Entities implemented: versioned materials with sourced density and per-kg costs; basic printer metadata; versioned slicer installations; digest-pinned slicer profile versions and validation/execution history; versioned business configurations; composable user roles; printer-profile associations; durable quote, order, print-job, and job-event tables; and slicer-run snapshots. Printer records are metadata only; no printer API or control is present.
+
+Configuration flow: the local `farm_domain.py` CLI initializes/migrates the database, registers Stage 3 evidence with its current trust findings, imports profile files and computes a SHA-256 manifest digest, configures materials/business costs/printers, and records profile execution and quote validation separately. New profile imports start `unverified` for execution and `needs_review` for quoting. Profile source/version identifiers and validation evidence are stored independently from slicer execution.
+
+Quote behavior: the Cura-only OpenClaw tool still accepts the fixed Stage 2 profile ID. It reads the current profile, material density/cost, and active business-configuration version from SQLite, and compares the registered profile digest to the fixed profile actually executed. A successful slice can be returned without a quote while the profile is unregistered, digest-mismatched, or quote-unapproved; it is stored as a slicer run rather than a quote estimate. Estimate snapshots record quote readiness and the exact profile/material/business versions. The example Stage 3 PLA density is registered only as proof input, explicitly marked not farm supplied.
+
+Migration notes: versions 1–5 are additive and repeatable; the existing local database was migrated from schema version 0 to 5 without changing its seven STL analyses or nine estimate records, then received Stage 3 registry records. Version 5 separates successful slicer runs from quote estimates. New migrations are applied when the persistence or domain entrypoint opens the database. Eight unit tests pass, covering legacy migration preservation/idempotence, Stage 3 registration idempotence, profile digests and trust gates, material/business versioning, quote snapshot versions, quote minimum fee/currency, and separate slicer-run persistence.
+
+Known profile states from Stage 3: Cura executes but remains `needs_review` because simplified-map material parity is unresolved. Orca remains `needs_review` for its compatibility adjustment and lack of native density/mass. Bambu remains `blocked` for quoting because of its anomalously high material metric; Stage 4 blocks approval of that same proof profile until a corrected, versioned profile is supported by new evidence. Creality remains `needs_review` pending farm validation. Only Cura remains exposed in OpenClaw, and profile state does not widen that allowlist.
+
+Questions/limitations: Stage 4 establishes storage and local configuration commands, not a conversational owner-onboarding UI or application authorization enforcement for the role tables. The current Stage 3 profile registration is proof metadata; a farm must import and validate its own files before trusting a quote. Existing estimate rows retain their original snapshots and are not retroactively reinterpreted.
+
+Next recommendation: begin Stage 5 with verified application identity binding and role-capability resolution using `farm_users` / `user_roles`. First prove a solo `[OWNER, OPERATOR]` identity and a two-user team, without treating OpenClaw sessions as ACLs. Then implement the controlled upload-to-job handoff required before customer-facing STL intake and connect the existing quote flow only to an approved, digest-matched profile/configuration. Cura currently remains `needs_review`, so Stage 5 must not bypass that quote gate. Printer control remains deferred to Stage 6; farm scheduling remains Stage 7.
+
 ---
 
-## Stage 5 — Three-Role Multiplayer Workflow
+## Stage 5 — Identity, Roles, and Multi-user Workflow Proof
 
 ### Goal
 
@@ -1024,6 +1052,10 @@ configure costs/materials/printers
 
 The same farm deployment should support these three trusted roles coherently. One user may hold multiple roles (including Owner + Operator); a team may distribute or overlap them. Demonstrate both a solo configuration and a team configuration when validating onboarding and permissions.
 
+### Recommended starting point
+
+Use the persisted `farm_users` / `user_roles` foundation to bind verified external sender identities to application users. Derive access from capability unions so `[OWNER, OPERATOR]` may belong to one user. Add the channel-neutral bridge and CUSTOMER-only first-request bootstrap before enabling public customer intake. Public WhatsApp sender identity must not inherit internal roles, legacy data, or shared-directory tools. Keep quote trust gating and all Stage 6 printer work deferred.
+
 ### Agent notes
 
 ```text
@@ -1044,59 +1076,43 @@ Failed scenarios:
 Open questions:
 ```
 
+### Stage 5 implementation notes — 2026-09-27
+
+**Stage 5 status: PARTIALLY PASSED.** A real WhatsApp text+STL intake completed and produced one CUSTOMER, job/order, and analysis; the customer received two confirmations. Transcript evidence shows separate normal agent turns for text and media, each calling the generic `message` tool for the same completed intake. No duplicate inbound media, second correlator job, or repeated analysis was found. The per-`intake_id` claim, fixed one-shot confirmation, public WhatsApp generic-message block, and duplicate-event cancellation guard are implemented. The next live attempt did not complete: two distinct text events reached the hook (`attachment_count=0`), leaving two pending requests without an intake ID, file, job, or reply claim. The previous sent receipt is scoped to its own intake, and the cancellation guard did not arm. The confirmation tool was not called; no attachment reached the correlator, so no completed-intake confirmation could be sent. The confirmation sender now prepares the WhatsApp adapter before persisting the reply claim, preventing a local adapter setup failure from consuming the claim. Local duplicate/retry, same-STL new-request, and consecutive-intake tests pass. The latest Gateway inspection found the Gateway offline, so no post-fix live delivery is proven. The channel-neutral correlator remains unchanged with 30-minute expiry, both event orders, restart recovery, one-time attachment consumption, and explicit ambiguity handling. Public DM intake remains enabled, groups disabled, private Gateway auth intact, legacy shared-directory tools denied, and `exec`/`process` denied. See the [Stage 5 report](stage-5-report.md) and [implementation plan](stage-5-implementation-plan.md).
+
+Identity mechanism tested: unit tests verify locally signed, short-lived HMAC-SHA256 assertions with issuer, stable subject, audience, issue/expiry times, and token ID. The production plugin uses OpenClaw's trusted inbound sender/account context and staged media event and signs the assertion inside the local bridge. A real WhatsApp sender and STL have traversed this flow and created a CUSTOMER/job. Session keys, labels, and conversation IDs are excluded from authorization.
+
+Role combinations proven: one solo user with `[OWNER, OPERATOR]`; and a team with separate OWNER, OPERATOR, CUSTOMER, and an unauthorized second CUSTOMER. OWNER configures materials/business costs, manages roles, inspects jobs, and updates status. OPERATOR inspects and updates jobs but cannot manage roles/configuration or submit as a customer. CUSTOMER submits requests and reads their own job, but cannot update status or access another customer's job.
+
+Upload proof: tests and the Python stdin bridge accept staged media bytes from normalized events, verify STL type/structure and the 25 MiB bound, check the private signing-key mode, persist the pending bytes with generated spool names, then create a job-linked `model.stl` under a generated job ID. Traversal, invalid type/structure, oversize, symlink substitution, digest changes, duplicate/reuse, unauthorized access, expiry cleanup, ambiguous matching, and process restart are tested. Analyzer/slicer tools receive only a generated job ID and safe filename. Pending requests and unattached files expire after 30 minutes; job files retain the 30-day default. One real WhatsApp STL completed the private handoff and analysis.
+
+The order links a generic `ModelSource`, currently implemented only as `ATTACHMENT` with validated STL content. A future `ModelResolver` may handle supported MakerWorld, Thingiverse, Printables, or similar URLs before the validated private model reaches analysis and `SlicerAdapter`. URL downloading, scraping, and remote resolution are expressly out of scope for Stage 5.
+
+The workflow creates an analysis, draft quote, pending order, and job for the verified customer. It does not issue a real quote; Stage 4 profile/material/business readiness and digest matching remain mandatory, and Cura remains `needs_review`. Stage 6 adds a separate local manual production workflow; it does not change intake or public WhatsApp behavior.
+
+### Next recommendation
+
+The latest live recovery verified exactly one provider-accepted confirmation for the existing completed intake. The stuck receipt was reconciled only after checking WhatsApp history; provider message ID and the visible outgoing message now agree. Do not ask for another intake solely to retest that reply path. Stage 5 remains partially passed until real Gateway authorization calls prove that a CUSTOMER can read only its own job and is denied staff actions while a restricted verified OWNER/OPERATOR is allowed to inspect/update jobs. Local Stage 6 manual-adapter domain work can proceed while that separate Gateway proof remains open; staff actions are not added to the public WhatsApp surface.
+
+**Latest live smoke — 2026-09-28:** The original 18:49 BRT sender-9584 text+STL was absent from the Gateway intake because the project WhatsApp session had logged out and cleared credentials earlier; reconnect did not backfill it. A resend reached and matched in Stage 5, but automatic finalization raised an undiagnosed generic `Error`. Persisted-match recovery created one job and one fixed confirmation was sent/recorded. Do not replay this completed intake. Keep Stage 5 partially passed until the bridge error is diagnosed and a fresh live intake completes automatically. Details: [Stage 5 report](stage-5-report.md).
+
 ---
 
 ## Stage 6 — Printer Adapter Layer
 
 ### Goal
 
-Separate physical printer connectivity from scheduling/business logic.
+Make an approved print job operational without requiring printer connectivity.
 
-Implement a first-class `ManualPrinterAdapter`.
+**Manual-adapter scope: PASSED (2026-09-28).** The persistent workflow lists approved ready jobs, assigns a configured manual printer, records operator-confirmed start, and records completion or failure. OWNER and OPERATOR capabilities are required for staff actions; customers can read only their own persisted job status. Each assignment and production transition appends a `job_events` record. `queued` is the persisted database state for the API status `READY_FOR_PRODUCTION`.
 
-Then investigate real adapters.
+Schema v10 adds `printers.adapter_id`, defaulting existing printer records to `manual`. A generic `PrinterAdapter` contract and `ManualPrinterAdapter` are implemented. An eligible job must already have an approved quote and an approved/queued order; the workflow does not alter quote-readiness or issue quotes.
 
-Suggested order:
-
-1. Manual
-2. OctoPrint
-3. Moonraker
-4. Bambu
-5. Creality
-
-### Required normalized concepts
-
-```text
-printer_id
-status
-current_job
-progress
-estimated_remaining_time
-capabilities
-```
-
-Do not require automatic control for a printer to be supported.
+Real printer integrations remain future work. OctoPrint, Moonraker, Bambu, and Creality connectivity, telemetry, automatic discovery, scheduling, and remote start/pause/cancel are deferred.
 
 ### Agent notes
 
-```text
-Adapter:
-Version/API:
-
-Read operations:
-
-Write/control operations:
-
-Authentication:
-
-Network requirements:
-
-Test result:
-
-Security concerns:
-
-Recommendation:
-```
+See [Stage 6 report](stage-6-report.md) for the implemented workflow, tests, and deferred integrations.
 
 ---
 
@@ -1395,13 +1411,7 @@ Agents should add new open questions as they are discovered.
 
 # 24. Immediate Priority
 
-Do not begin by expanding the product.
-
-Stages 1–3 have now been completed at the documented scopes. The immediate priority is:
-
-> **Stage 4 — build the persistent domain model and farm configuration, including a versioned slicer/profile registry and explicit material-density settings.**
-
-Keep Orca out of the model-facing OpenClaw tool until the imported profile and density have passed that validation flow. Do not add printer control in Stage 4.
+The immediate release priority is to keep the manual production workflow demoable and finish the separately tracked Stage 5 Gateway authorization proof. Real printer connectivity remains deferred. Keep each slicer behind its existing profile/digest and quote-readiness gates.
 
 ---
 

@@ -1,0 +1,49 @@
+{
+  "errors": [],
+  "execution_wall_seconds": 0.339,
+  "gcode_reconciliation": {
+    "configured_quote_density_required": true,
+    "filament_diameter_mm": 1.75,
+    "filament_length_mm": 825.6,
+    "slicer_density_g_cm3": 1.26,
+    "slicer_weight_g": 2.5,
+    "volume_error_fraction": 5e-06,
+    "volume_from_length_mm3": 1985.8
+  },
+  "material_consumption": {
+    "volume_mm3": 1985.81
+  },
+  "output_artifact": {
+    "media_type": "text/x-gcode",
+    "size_bytes": 167581
+  },
+  "print_time_seconds": 482,
+  "profile": {
+    "filament_preset_id": "Bambu PLA Basic @BBL A1",
+    "id": "bambu-a1-04-bambu-pla-basic-020-standard",
+    "material": "Bambu PLA Basic @BBL A1 (bundled Bambu preset)",
+    "nozzle_diameter_mm": 0.4,
+    "printer": "Bambu Lab A1 0.4 nozzle (bundled Bambu preset)",
+    "printer_model": "Bambu Lab A1",
+    "process": "0.20mm Standard @BBL A1 (bundled Bambu preset)",
+    "process_preset_id": "0.20mm Standard @BBL A1",
+    "profile_source": "Bambu Studio 02.08.02.61 bundled BBL system presets with resolved values and identity metadata",
+    "profile_source_digest": "ed6ace8e94e869076168f560f4cbaa971a09eeefb40d2b40adca1753a6bff242"
+  },
+  "schema_version": 1,
+  "slice_summary": {
+    "filament_changes": 0,
+    "filament_count": 1,
+    "layer_count": 60,
+    "object_count": 1,
+    "object_dimensions_mm": {
+      "x": 20.0,
+      "y": 20.0,
+      "z": 12.0
+    },
+    "triangle_count": 12
+  },
+  "slicer_id": "bambustudio",
+  "slicer_version": "02.08.02.61",
+  "warnings": []
+}

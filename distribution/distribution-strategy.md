@@ -46,6 +46,12 @@ The immediate goal is:
 
 After that, expand toward 10+ real users.
 
+## Tester workflow signal — 2026-09-28
+
+One committed tester confirmed a Bambu Lab A1 with a 0.4 mm nozzle and uses Bambu Studio because it already connects directly to the printer. This is real distribution evidence: prioritize Bambu Studio slice/estimate compatibility to fit that tester's existing workflow and reduce onboarding friction. The direct connection also makes eventual printer-side integration an expected product need, but printer APIs, job control, telemetry, and Stage 6 adapters remain outside the current homologation.
+
+The A1 0.4 mm machine is now directly aligned with confirmed tester hardware, rather than only a temporary baseline. The single-filament PLA material and 0.20 mm Standard process remain the repository's investigation choices; the tester has not confirmed those settings. Next, resolve Bambu preset/CLI compatibility and establish GUI↔CLI parity. Do not begin physical print validation until parity passes. Keep Bambu off the OpenClaw allowlist and keep quoting blocked during homologation. See the [Bambu homologation plan](../docs/bambu-homologation-implementation-plan.md).
+
 ---
 
 # 2. Ideal Tester Profile

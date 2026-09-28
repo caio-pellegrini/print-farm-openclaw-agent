@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Slice one staged fixture through CuraEngine and OrcaSlicer adapters."""
+"""Slice one staged fixture through each executed Stage 3 adapter."""
 import hashlib
 import json
 import os
@@ -16,6 +16,8 @@ from quote import quote_slicer_result
 from slicer_adapters import (
     CURA_PROFILE_ID,
     ORCA_PROFILE_ID,
+    BAMBU_PROFILE_ID,
+    CREALITY_PROFILE_ID,
     slice_with_adapter,
 )
 
@@ -45,6 +47,8 @@ def main():
         for slicer_id, profile_id in (
             ("curaengine", CURA_PROFILE_ID),
             ("orcaslicer", ORCA_PROFILE_ID),
+            ("bambustudio", BAMBU_PROFILE_ID),
+            ("crealityprint", CREALITY_PROFILE_ID),
         ):
             normalized = slice_with_adapter(slicer_id, staged, profile_id)
             normalized["input_sha256"] = fixture_hash

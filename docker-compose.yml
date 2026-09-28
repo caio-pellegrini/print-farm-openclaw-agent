@@ -1,0 +1,19 @@
+services:
+  print-farm-operator:
+    image: ghcr.io/caio-pellegrini/print-farm-operator:v1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:18789:18789"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENCLAW_GATEWAY_PORT: 18789
+      AGENT_INDEX_SLUG: print-farm-operator
+      PLOW_AGENT_TOKEN: ${PLOW_AGENT_TOKEN:-}
+    volumes:
+      - print-farm-data:/data
+
+volumes:
+  print-farm-data:

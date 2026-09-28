@@ -25,7 +25,6 @@ PROFILE_MAP = {
         "definition": "/opt/cura/resources/definitions/ultimaker2_plus.def.json",
         "extruder_definition": "/opt/cura/resources/extruders/ultimaker2_plus_extruder_0.def.json",
         "material": "PLA",
-        "filament_density_g_cm3": 1.24,
         "filament_diameter_mm": 2.85,
         # Values from Cura's bundled generic_pla material and
         # quality/ultimaker2_plus/{um2p_global_Normal_Quality,
@@ -52,18 +51,6 @@ PROFILE_MAP = {
         },
     }
 }
-BUSINESS_CONFIG = {
-    "material_brl_per_kg": 90.0,
-    "machine_brl_per_hour": 2.0,
-    "energy_kwh_per_hour": 0.12,
-    "energy_brl_per_kwh": 0.95,
-    "gross_margin_fraction": 0.40,
-    "setup_brl": 0.0,
-    "currency": "BRL",
-    "source": "Existing quote-engine example defaults; farm must configure before real offers.",
-}
-
-
 def fail(message: str, *, code: int = 2) -> int:
     json.dump({"success": False, "error": message}, sys.stdout, ensure_ascii=False)
     sys.stdout.write("\n")
@@ -149,7 +136,6 @@ def run_cura(docker: str, profile_id: str, source: Path, profile_info: dict) -> 
     length_m = float(length_match.group(1)) if length_match else None
     if print_time <= 0 or not math.isfinite(volume_mm3) or volume_mm3 <= 0:
         raise RuntimeError("CuraEngine returned invalid time or filament metrics.")
-    grams = volume_mm3 / 1000 * profile_info["filament_density_g_cm3"]
     warnings = warning_lines[:5]
     if len(warning_lines) > len(warnings):
         warnings.append(f"{len(warning_lines) - len(warnings)} additional Cura warning diagnostics omitted.")
@@ -160,9 +146,8 @@ def run_cura(docker: str, profile_id: str, source: Path, profile_info: dict) -> 
         "profile_label": profile_info["label"],
         "print_time_seconds": print_time,
         "filament_volume_mm3": volume_mm3,
+        "material_consumption": {"volume_mm3": volume_mm3},
         "filament_length_m": length_m,
-        "filament_grams_per_unit_estimated": round(grams, 3),
-        "filament_density_g_cm3_configured": profile_info["filament_density_g_cm3"],
         "warning_count": len(warning_lines),
         "error_diagnostic_count": len(error_lines),
         "warnings": warnings,
@@ -229,65 +214,147 @@ def main() -> int:
             return fail("Run analyze_stl first and provide its matching analysis_id.")
         analysis = stored_analysis["analysis"]
         slicing = run_cura(args.docker_executable, args.profile, candidate, profile_info)
-
-        sys.path.insert(0, str(args.quote_engine.parent))
-        from quote import quote
-
-        grams_per_unit = slicing["filament_grams_per_unit_estimated"]
-        hours_per_unit = slicing["print_time_seconds"] / 3600
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+        from farm_domain import active_quote_configuration, digest_files
+        profile_digest = digest_files({"cura-profile-map.json": json.dumps(
+            profile_info, sort_keys=True, separators=(",", ":")).encode("utf-8")})
+        slicing["profile_source_digest"] = profile_digest
+        quote_config = active_quote_configuration(args.database_path, args.profile, profile_digest)
+        quote_result = None
+        business_snapshot = {"source": "No approved farm quote configuration", "currency": None}
+        quote_readiness = "unregistered" if quote_config is None else quote_config["quote_status"]
+        profile_version = quote_config.get("profile_version") if quote_config else None
+        material_id = material_version = business_version = None
+        grams_per_unit = None
+        readiness_state = {"unregistered": "BLOCKED", "blocked": "BLOCKED",
+                           "needs_review": "UNDER_VALIDATION", "approved": "QUOTE_SAFE"}.get(
+                               quote_readiness, "BLOCKED")
+        slicing["profile_version"] = profile_version
+        slicing["execution_status"] = quote_config.get("execution_status", "unverified") if quote_config else "unverified"
+        slicing["quote_readiness"] = {
+            "status": quote_readiness,
+            "state": readiness_state,
+            "findings": quote_config.get("findings", ["No Stage 4 profile is registered."]) if quote_config else ["No Stage 4 profile is registered."],
+        }
+        if quote_config:
+            slicing["registered_profile_source_digest"] = quote_config.get("source_digest")
+            if quote_config.get("material_provenance"):
+                slicing["quote_material_provenance"] = quote_config["material_provenance"]
+        if quote_config and quote_config.get("ready"):
+            from quote import quote
+            profile_version = quote_config["profile_version"]
+            material = quote_config["material"]
+            business = quote_config["business"]
+            material_version = material["material_version"]
+            material_id = material["material_id"]
+            business_version = business["version"]
+            grams_per_unit = slicing["material_consumption"]["volume_mm3"] / 1000 * material["density_value"]
+            slicing["filament_grams_per_unit_estimated"] = round(grams_per_unit, 3)
+            slicing["filament_density_g_cm3_configured"] = material["density_value"]
+            hours_per_unit = slicing["print_time_seconds"] / 3600
+            quote_result = quote(
+                grams_per_unit, hours_per_unit,
+                material_brl_kg=material["cost_per_kg"],
+                machine_brl_h=business["machine_hour_cost"],
+                energy_kwh=business["energy_kwh_per_hour"],
+                energy_brl_kwh=business["energy_cost_per_kwh"],
+                margin=business["minimum_margin_fraction"],
+                quantity=args.quantity,
+                setup_brl=business["setup_fee"],
+                minimum_order_fee=business["minimum_job_fee"],
+                currency=business["currency"],
+            )
+            quote_result["minimum_job_fee_brl"] = business["minimum_job_fee"]
+            if business["currency"] != "BRL":
+                quote_result["estimated_cost"] = quote_result.pop("estimated_cost_brl")
+                quote_result["suggested_unit_price"] = quote_result.pop("suggested_unit_price_brl")
+                quote_result["suggested_order_price"] = quote_result.pop("suggested_order_price_brl")
+                quote_result["estimated_gross_profit"] = quote_result.pop("estimated_gross_profit_brl")
+                quote_result["minimum_job_fee"] = quote_result.pop("minimum_job_fee_brl")
+            quote_readiness = "approved"
+            business_snapshot = {
+                "version": business_version, "currency": business["currency"],
+                "machine_hour_cost": business["machine_hour_cost"],
+                "energy_kwh_per_hour": business["energy_kwh_per_hour"],
+                "energy_cost_per_kwh": business["energy_cost_per_kwh"],
+                "minimum_margin_fraction": business["minimum_margin_fraction"],
+                "minimum_job_fee": business["minimum_job_fee"], "setup_fee": business["setup_fee"],
+                "source": business["source"],
+                "material": {"material_id": material_id, "version": material_version,
+                    "name": material["name"], "density_value": material["density_value"],
+                    "density_unit": material["density_unit"], "density_source": material["density_source"],
+                    "density_source_ref": material["density_source_ref"],
+                    "cost_per_kg": material["cost_per_kg"], "currency": material["material_currency"]},
+            }
         copy_label = "copy" if args.quantity == 1 else "copies"
-        quote_result = quote(
-            grams_per_unit,
-            hours_per_unit,
-            material_brl_kg=BUSINESS_CONFIG["material_brl_per_kg"],
-            machine_brl_h=BUSINESS_CONFIG["machine_brl_per_hour"],
-            energy_kwh=BUSINESS_CONFIG["energy_kwh_per_hour"],
-            energy_brl_kwh=BUSINESS_CONFIG["energy_brl_per_kwh"],
-            margin=BUSINESS_CONFIG["gross_margin_fraction"],
-            quantity=args.quantity,
-            setup_brl=BUSINESS_CONFIG["setup_brl"],
+        request_summary = (
+            f"Cura production estimate for {args.quantity} {copy_label} "
+            f"of {args.filename} using {args.profile}."
         )
-        with tempfile.TemporaryDirectory(prefix="production-estimate-") as temporary:
-            estimate_record = {
+        with tempfile.TemporaryDirectory(prefix="production-record-") as temporary:
+            if quote_result is not None:
+                estimate_record = {
                 "analysis_id": args.analysis_id,
                 "filename": args.filename,
                 "profile": args.profile,
-                "request_summary": (
-                    f"Cura production estimate for {args.quantity} {copy_label} "
-                    f"of {args.filename} using {args.profile}."
-                ),
+                "request_summary": request_summary,
                 "slicing": slicing,
                 "estimated_material_g": round(grams_per_unit * args.quantity, 3),
                 "estimated_print_time_seconds": slicing["print_time_seconds"] * args.quantity,
                 "quote": quote_result,
-                "business_config": BUSINESS_CONFIG,
-            }
-            estimate_path = Path(temporary) / "estimate.json"
-            estimate_path.write_text(json.dumps(estimate_record), encoding="utf-8")
-            stored_estimate_process = subprocess.run(
-                [args.python_executable, str(args.persistence_script), "store-estimate",
-                 "--database", str(args.database_path), "--estimate-file", str(estimate_path)],
-                check=True, capture_output=True, text=True, timeout=TIMEOUT_SECONDS,
-            )
-            stored_estimate = json.loads(stored_estimate_process.stdout)
+                "business_config": business_snapshot,
+                "quote_readiness_status": quote_readiness,
+                "profile_version": profile_version,
+                "material_id": material_id,
+                "material_version": material_version,
+                "business_config_version": business_version,
+                }
+                record_path = Path(temporary) / "estimate.json"
+                record_path.write_text(json.dumps(estimate_record), encoding="utf-8")
+                stored_process = subprocess.run(
+                    [args.python_executable, str(args.persistence_script), "store-estimate",
+                     "--database", str(args.database_path), "--estimate-file", str(record_path)],
+                    check=True, capture_output=True, text=True, timeout=TIMEOUT_SECONDS,
+                )
+                stored_record = json.loads(stored_process.stdout)
+                record_type = "estimate"
+            else:
+                run_record = {"analysis_id":args.analysis_id,"filename":args.filename,
+                    "profile":args.profile,"profile_version":profile_version,"slicing":slicing,
+                    "quote_readiness_status":quote_readiness}
+                record_path = Path(temporary) / "slicer-run.json"
+                record_path.write_text(json.dumps(run_record), encoding="utf-8")
+                stored_process = subprocess.run(
+                    [args.python_executable, str(args.persistence_script), "store-slicer-run",
+                     "--database", str(args.database_path), "--run-file", str(record_path)],
+                    check=True, capture_output=True, text=True, timeout=TIMEOUT_SECONDS,
+                )
+                stored_record = json.loads(stored_process.stdout)
+                record_type = "slicer_run"
 
         result = {
             "success": True,
             "analysis_id": args.analysis_id,
-            "estimate_id": stored_estimate["estimate_id"],
+            "estimate_id": stored_record.get("estimate_id"),
+            "slicer_run_id": stored_record.get("run_id"),
             "filename": args.filename,
             "profile": args.profile,
             "mesh_analysis": analysis,
             "slicing": slicing,
             "quantity": args.quantity,
-            "estimated_material_g": round(grams_per_unit * args.quantity, 3),
+            "estimated_material_g": round(grams_per_unit * args.quantity, 3) if grams_per_unit is not None else None,
             "estimated_print_time_seconds": slicing["print_time_seconds"] * args.quantity,
             "quote": quote_result,
-            "business_config": BUSINESS_CONFIG,
-            "request_summary": estimate_record["request_summary"],
-            "created_at": stored_estimate["created_at"],
-            "status": stored_estimate["status"],
-            "estimate_scope": "Estimated values based on the selected Cura profile and example business configuration.",
+            "business_config": business_snapshot,
+            "request_summary": request_summary,
+            "created_at": stored_record["created_at"],
+            "status": stored_record.get("status", stored_record.get("execution_status")),
+            "record_type": record_type,
+            "quote_readiness_status": quote_readiness,
+            "quote_readiness_state": readiness_state,
+            "profile_validation": quote_config,
+            "estimate_scope": ("Farm quote configuration and a reviewed profile version." if quote_readiness == "approved"
+                               else "Slicer execution completed and was stored as a slicer run; no business quote was issued because profile validation is not quote-approved."),
         }
         json.dump(result, sys.stdout, ensure_ascii=False)
         sys.stdout.write("\n")
