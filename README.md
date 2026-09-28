@@ -100,6 +100,8 @@ The repo includes the official [standalone Agent Index client](standalone/agent_
 To register this install after you have exercised at least one agent turn:
 
 ```sh
+git clone https://github.com/plow-pbc/plow-agents.git
+export PATH="$PWD/plow-agents/bin:$PATH"
 plow-agents login
 export PLOW_AGENT_TOKEN="$(cat ~/.config/plow/token)"
 docker compose exec print-farm-operator python3 /opt/print-farm-operator/standalone/agent_index_client.py \
@@ -113,6 +115,8 @@ docker compose exec -e "PLOW_AGENT_TOKEN=$PLOW_AGENT_TOKEN" print-farm-operator 
 plow-agents image push ghcr.io/caio-pellegrini/print-farm-operator:v1
 plow-agents profile --show
 ```
+
+The login command prints an activation phrase and phone number; complete that step from your phone. GHCR may prompt for a GitHub classic personal access token with package write permission. After the first successful push, make the package public in GitHub Packages settings and use the digest reference printed by the CLI when you contact the Agent Index admins.
 
 The vendored upstream client is adjusted so `--dry-run` can collect and display local usage before registration; the upstream version currently checks for an Index-issued reporting key even in dry-run mode. Dry-run does not send a usage report. Registration still needs the Plow login token, and subsequent reports need the Index-issued key persisted in the volume.
 
