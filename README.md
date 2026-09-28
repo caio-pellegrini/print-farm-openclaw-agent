@@ -111,6 +111,7 @@ docker compose exec -e "PLOW_AGENT_TOKEN=$PLOW_AGENT_TOKEN" print-farm-operator 
   --register --agent print-farm-operator \
   --name 'Print Farm Operator' \
   --blurb 'Your first operations hire for your 3D printing business.' \
+  --repo https://github.com/caio-pellegrini/print-farm-openclaw-agent \
   --install-url https://github.com/caio-pellegrini/print-farm-openclaw-agent
 plow-agents image push ghcr.io/caio-pellegrini/print-farm-operator:v1
 plow-agents profile --show
